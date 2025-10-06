@@ -34,10 +34,11 @@ class OptModel:
         X = m.addVars(self.T, lb=0, name="Export")
         G = m.addVars(self.T, lb=0, name="PV_gen")
         L = m.addVars(self.T, lb=0, name="Load")
+        C = m.addVars(self.T, lb=0, name="Curtail")
 
         # Objective
         m.setObjective(
-            gp.quicksum((self.p[t] + self.g[t]) * I[t] + (self.g[t] - self.p[t]) * X[t] + self.c_pv[t] * G[t] for t in range(self.T)),
+            gp.quicksum((self.p[t] + self.g[t]) * I[t] + (self.g[t] - self.p[t]) * X[t] + self.c_pv[t] * (self.pv_max[t] - C[t]) for t in range(self.T)),
             GRB.MINIMIZE
         )
 
