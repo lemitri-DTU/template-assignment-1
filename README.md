@@ -156,3 +156,20 @@ These files allow customization of user behavior, DER production, and network co
 
 ## Starter Code Structure
 
+
+
+# Notes
+## Github
+**How to create a new branch in Github**
+```
+git branch
+git checkout -b new-branch-name
+git push -u origin new-branch-name
+```
+**How to pull a branch**
+```
+git checkout branch-name
+git pull
+```
+After you've done your edit
+Add, commit, and push
