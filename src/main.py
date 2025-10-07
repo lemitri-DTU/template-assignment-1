@@ -11,23 +11,45 @@ Suggested structure:
 import os
 print(f"datapath: {os.path.abspath('../Group18_assignment_1/data/question_1a')}")
 
+# main.py
 from data_ops.data_loader import DataLoader
 from opt_model.opt_model import OptModel
 
 if __name__ == "__main__":
+    loader = DataLoader("../Group18_assignment_1/data")
+    loader.load_question1a()
+    params = loader.get_params_for_q1a()
 
-    # Initialize data loader
-    loader = DataLoader(input_path="../Group18_assignment_1/data")  # path where 'question1a' folder is
-
-    # Load data for Question 1(a)
-    params = loader.get_params_for_q1a("question_1a")
-
-    # Initialize and solve optimization
     model = OptModel(params)
     results = model.solve()
 
-    print("\n--- Optimization results ---")
     for k, v in results.items():
-        if k != "Objective":
-            print(f"{k}: {v[:5]} ...")  # print first few hours
-    print(f"Objective value: {results['Objective']:.2f} DKK")
+        print(k, v)
+
+
+# # main.py
+# from data_ops.data_loader import DataLoader
+# from opt_model.opt_model import OptModel
+
+# if __name__ == "__main__":
+#     # datapath
+#     data_path = "../Group18_assignment_1/data"
+#     question_name = "question_1a"
+
+#     # initialize DataLoader
+#     loader = DataLoader(input_path=data_path)
+
+#     # Get OptModel parameters
+#     params = loader.get_params_for_q1a(question_name)
+
+#     # Initialize and solve optimization model
+#     model = OptModel(params)
+#     results = model.solve()
+
+#     # Print results
+#     if results:
+#         print("\n--- Optimization results (first 5 hours) ---")
+#         for k, v in results.items():
+#             if k != "Objective":
+#                 print(f"{k}: {v[:5]} ...")
+#         print(f"Objective value: {results['Objective']:.2f} DKK")
