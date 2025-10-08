@@ -68,6 +68,17 @@ class OptModel:
             GRB.MINIMIZE
         )
 
+        #save the attributes
+        self.model = m
+        self.I = I
+        self.X = X
+        self.L = L
+        self.G = G
+        self.C = C
+        self.T = self.T
+        self.E_min = self.E_min
+        self.p = self.p
+
         # Solve
         m.optimize()
 
