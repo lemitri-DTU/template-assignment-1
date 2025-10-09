@@ -7,7 +7,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from data_ops.data_loader import DataLoader
-from opt_model.opt_model_b import OptModelFlex  # 上面保存的文件/类
+from opt_model.opt_model_b import OptModelFlex  
 
 OUTPUT_DIR = Path("src/output/question1b")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
