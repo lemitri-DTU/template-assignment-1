@@ -95,90 +95,67 @@ class DataLoader:
         print("E_min =", params["E_min"])
         print("c_pv =", params["c_pv"])
 
+        # return params
+
+    def load_question1b(self):
+        """
+        Load all required JSON files for Question 1(b).
+        Same structure as Question 1(a), but usage_preference.json now includes
+        hourly reference load profile instead of a fixed minimum energy requirement.
+        """
+        question_name = "question_1b"
+        self.appliance_params = self._load_json("appliance_params.json", question_name)
+        self.consumer_params = self._load_json("consumer_params.json", question_name)
+        self.DER_production = self._load_json("DER_production.json", question_name)
+        self.usage_preferences = self._load_json("usage_preferences.json", question_name)
+        print("All JSON files loaded for question1b.")
+
+
+    def get_params_for_q1b(self):
+        """
+        Convert loaded JSON data into parameters usable by OptModelFlex (for Question 1b).
+        Returns a dictionary with keys: T, pv_max, p, g, c_pv, L_ref, alpha
+        """
+        import numpy as np
+
+        # PV maximum available per hour
+        pv_max_power = self.appliance_params["DER"][0]["max_power_kW"]
+        pv_profile = np.array(self.DER_production[0]["hourly_profile_ratio"])
+        pv_max = pv_max_power * pv_profile  # kWh per hour
+
+        # Reference load profile from usage_preference.json
+        L_ref_ratio = np.array(self.usage_preferences[0]["load_preferences"][0]["hourly_profile_ratio"])
+        L_ref = L_ref_ratio / L_ref_ratio.max() * 10  # scale to a reasonable magnitude (e.g., 0–10 kWh)
+
+        # Number of time steps
+        T = len(pv_max)
+
+        # Hourly electricity price and grid tariff
+        p = np.linspace(1.0, 3.0, T)      # price [€/kWh]
+        g = np.full(T, 0.2)               # grid tariff [€/kWh]
+
+        # PV marginal cost (assumed small positive)
+        c_pv = np.full(T, 2)
+
+        # Discomfort penalty weight (α): can test multiple scenarios later
+        alpha = 1.0
+
+        params = {
+            "T": T,
+            "pv_max": pv_max,
+            "p": p,
+            "g": g,
+            "c_pv": c_pv,
+            "L_ref": L_ref,
+            "alpha": alpha
+        }
+
+        print("T =", params["T"])
+        print("pv_max =", params["pv_max"])
+        print("p =", params["p"])
+        print("g =", params["g"])
+        print("c_pv =", params["c_pv"])
+        print("L_ref =", params["L_ref"])
+        print("alpha =", params["alpha"])
+
         return params
-
-# class DataLoader:
-#     """Loads energy system input data and prepares parameters for optimization."""
-
-#     def __init__(self, input_path=None):
-#         self.input_path = Path(input_path) if input_path else None
-
-#     def _load_dataset(self, question_name: str):
-#         """Load all relevant JSON files for the question."""
-#         question_path = self.input_path / question_name
-#         if not question_path.exists():
-#             raise FileNotFoundError(f"Question folder {question_path} not found.")
-
-#         expected_files = [
-#             'appliance_params.json',
-#             'bus_params.json',
-#             'consumer_params.json',
-#             'DER_production.json',
-#             'usage_preference.json'
-#         ]
-#         for fname in expected_files:
-#             fpath = question_path / fname
-#             if fpath.exists():
-#                 with open(fpath, 'r') as f:
-#                     data = json.load(f)
-#                     setattr(self, fname.replace('.json', ''), data)
-
-#     def get_params_for_q1a(self, question_name: str):
-#         """
-#         Extract parameters for OptModel for Question 1(a).
-#         Returns a dictionary ready to pass to OptModel.
-#         """
-#         # Load JSON files
-#         self._load_dataset(question_name)
-
-#         # --- PV ---
-#         app = self.appliance_params
-#         der = self.DER_production
-#         usage = self.usage_preference
-
-#         max_pv_power = app["DER"][0]["max_power_kW"]
-#         pv_profile = np.array(der[0]["hourly_profile_ratio"])
-#         pv_max = max_pv_power * pv_profile
-
-#         # --- Load ---
-#         E_min = usage[0]["load_preferences"][0]["min_total_energy_per_day_hour_equivalent"]
-#         max_load = app["load"][0]["max_load_kWh_per_hour"]
-
-#         # --- Prices and grid tariffs ---
-#         T = len(pv_max)
-#         p = np.linspace(1.0, 3.0, T)   # replace with real prices if available
-#         g = np.full(T, 0.2)             # flat grid tariff
-
-#         # --- Return params dictionary ---
-#         params = {
-#             "T": T,
-#             "p": list(p),
-#             "g": list(g),
-#             "pv_max": list(pv_max),
-#             "E_min": float(E_min),
-#             "max_load": float(max_load)
-#         }
-#         return params
-
-
-
-    # def _load_data_file(self, question_name: str, file_name: str):
-    #     """
-    #     Placeholder function 
-    #     Helper function to load a specific CSV or json file, using the appropriate method based on file extension.. Raises FileNotFoundError if missing.
-        
-    #     example usage: 
-    #     define and call a load_data_file() function from utils.py to load a specific file in the input_path directory
-    #     save all data as class attributes (e.g. self.demand, self.wind, etc.), structured as pandas DataFrames or Series (or other format as prefered)"""
-    #     pass
-
-    # def load_aux_data(self, question_name: str, filename: str):
-    #     """
-    #     Placeholder Helper function to Load auxiliary metadata for the scenario/question from a YAML/json file or other formats
-        
-    #     Example application: 
-    #     define and call a load_aux_data() function from utils.py to load a specific auxiliary file in the input_path directory
-    #     Save the content as s class attributes, in a dictionary, pd datframe or other: self.aux_data
-    #     Attach key values as class attributes (flattened).
-    #     """
-    #     pass

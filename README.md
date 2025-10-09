@@ -171,5 +171,10 @@ git push -u origin new-branch-name
 git checkout branch-name
 git pull
 ```
+If you want to pull the whole branch from one to another
+```
+git checkout branch-name
+git merge branch-that-you-wanna-pull
+```
 After you've done your edit
 Add, commit, and push
